@@ -58,8 +58,8 @@ class PreferenceDao {
         return value == 1;
     }
 
-    public static void remove(Context context, String key) {
-        Uri URI = Uri.parse(getUriByType(PreferenceProvider.PREF_STRING) + key);
+    public static void remove(Context context, String name, String key) {
+        Uri URI = buildUri(name, key, PreferenceProvider.PREF_STRING);
         context.getContentResolver().delete(URI, null, null);
     }
 

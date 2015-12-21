@@ -54,8 +54,8 @@ public class DPreference {
         return PreferenceDao.getLong(mContext, mName, key, defaultValue);
     }
 
-    public void removePreference(final String key) {
-        PreferenceDao.remove(mContext, key);
+    public void removePreference(String key) {
+        PreferenceDao.remove(mContext, mName, key);
     }
 
 }
