@@ -1,4 +1,4 @@
-package me.dozen;
+package me.dozen.sample;
 
 
 import android.content.Context;
@@ -23,7 +23,7 @@ public class Test {
             dPreference.setPrefString( "test_string", "test_pref");
         }
         long end = System.currentTimeMillis();
-        Log.i(TAG, "DPreferecne i/o setString 1000 cost : " + (end - start));
+        Log.i(TAG, "DPreferecne called setString 1000 times cost : " + (end - start));
 
 
         long start1 = System.currentTimeMillis();
@@ -31,7 +31,7 @@ public class Test {
             dPreference.getPrefString("test_string", "test_pref");
         }
         long end1 = System.currentTimeMillis();
-        Log.i(TAG, "DPreferecne i/o getString 1000 cost : " + (end1 - start1));
+        Log.i(TAG, "DPreferecne called getString 1000 times cost : " + (end1 - start1));
 
         boolean b = dPreference.getPrefBoolean("test_boolean", false);
         Log.i(TAG, " getboolean default : " + b);
@@ -60,7 +60,7 @@ public class Test {
             appPreferences.put("test_string", "test_pref");
         }
         long end = System.currentTimeMillis();
-        Log.i(TAG, "Tray i/o setString 1000 cost : " + (end - start));
+        Log.i(TAG, "Tray calle setString 1000 times cost : " + (end - start));
 
 
         long start1 = System.currentTimeMillis();
@@ -68,6 +68,6 @@ public class Test {
             appPreferences.getString("test_string", "test_pref");
         }
         long end1 = System.currentTimeMillis();
-        Log.i(TAG, "Tray i/o getString 1000 cost : " + (end1 - start1));
+        Log.i(TAG, "Tray called getString 1000 times cost : " + (end1 - start1));
     }
 }

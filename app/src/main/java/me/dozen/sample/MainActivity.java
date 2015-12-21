@@ -1,10 +1,12 @@
-package me.dozen;
+package me.dozen.sample;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+
+import me.dozen.R;
 
 
 public class MainActivity extends AppCompatActivity {

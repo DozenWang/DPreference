@@ -2,7 +2,7 @@ package ledongli.safepreference;
 
 import org.junit.Test;
 
-import me.dozen.Test;
+import me.dozen.sample.Test;
 
 import static org.junit.Assert.*;
 

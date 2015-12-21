@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">SafePreference</string>
+    <string name="app_name">DPreferenceDemo</string>
     <string name="action_settings">Settings</string>
 </resources>
