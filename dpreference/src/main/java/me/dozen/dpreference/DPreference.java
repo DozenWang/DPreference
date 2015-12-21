@@ -6,10 +6,10 @@ import android.content.Context;
 /**
  * Created by wangyida on 15-4-9.
  */
-public class PreferenceUtils {
+public class DPreference {
 
 
-    private PreferenceUtils() {
+    private DPreference() {
     }
 
     public static String getPrefString(Context context, final String key,
