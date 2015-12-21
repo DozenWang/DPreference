@@ -203,7 +203,25 @@ public class PreferenceProvider extends ContentProvider {
         String name = uri.getPathSegments().get(1);
         String key = uri.getPathSegments().get(2);
         return new PrefModel(name, key);
+    }
 
+
+    public static Uri buildUri(String name, String key, int type) {
+        return Uri.parse(getUriByType(type) + name + "/" + key);
+    }
+
+    private static String getUriByType(int type) {
+        switch (type) {
+            case PreferenceProvider.PREF_BOOLEAN:
+                return PreferenceProvider.CONTENT_PREF_BOOLEAN_URI;
+            case PreferenceProvider.PREF_INT:
+                return PreferenceProvider.CONTENT_PREF_INT_URI;
+            case PreferenceProvider.PREF_LONG:
+                return PreferenceProvider.CONTENT_PREF_LONG_URI;
+            case PreferenceProvider.PREF_STRING:
+                return PreferenceProvider.CONTENT_PREF_STRING_URI;
+        }
+        throw new IllegalStateException("unsupport preftype : " + type);
     }
 
     private static class PrefModel {
