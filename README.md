@@ -22,4 +22,16 @@ DPreference is a way solving this problem powered by a ContentProvider. It works
        dPreference.setPrefString( "key", "value");
 
 ```
+####Compare With Tray(https://github.com/grandcentrix/tray/)
+- **DPreference** 
+    `setString` called 1000 times cost : 375 ms
+    `getString` called 1000 times cost : 186 ms
+- **Tray** 
+    `setString` called 1000 times cost : 13699 ms 
+    `getString` called 1000  times cost : 3496 ms
 
+####So DPreference has a better performance.
+
+
+  
+  
