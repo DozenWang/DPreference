@@ -10,8 +10,12 @@ import android.net.Uri;
  */
 class PreferenceDao {
 
-    public static String getString(Context context, String key, String defaultValue) {
-        Uri URI = Uri.parse(getUriByType(PreferenceProvider.PREF_STRING) + key);
+    private static Uri buildUri(String name, String key, int type) {
+        return Uri.parse(getUriByType(type) + name + "/" + key);
+    }
+
+    public static String getString(Context context,String name, String key, String defaultValue) {
+        Uri URI = buildUri(name, key, PreferenceProvider.PREF_STRING);
         String value = defaultValue;
         Cursor cursor = context.getContentResolver().query(URI, null, null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
@@ -21,8 +25,8 @@ class PreferenceDao {
         return value;
     }
 
-    public static int getInt(Context context, String key, int defaultValue) {
-        Uri URI = Uri.parse(getUriByType(PreferenceProvider.PREF_INT) + key);
+    public static int getInt(Context context, String name, String key, int defaultValue) {
+        Uri URI = buildUri(name, key, PreferenceProvider.PREF_INT);
         int value = defaultValue;
         Cursor cursor = context.getContentResolver().query(URI, null, null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
@@ -32,8 +36,8 @@ class PreferenceDao {
         return value;
     }
 
-    public static long getLong(Context context, String key, long defaultValue) {
-        Uri URI = Uri.parse(getUriByType(PreferenceProvider.PREF_LONG) + key);
+    public static long getLong(Context context,String name, String key, long defaultValue) {
+        Uri URI = buildUri(name, key, PreferenceProvider.PREF_LONG);
         long value = defaultValue;
         Cursor cursor = context.getContentResolver().query(URI, null, null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
@@ -43,8 +47,8 @@ class PreferenceDao {
         return value;
     }
 
-    public static boolean getBoolean(Context context, String key, boolean defaultValue) {
-        Uri URI = Uri.parse(getUriByType(PreferenceProvider.PREF_BOOLEAN) + key);
+    public static boolean getBoolean(Context context,String name, String key, boolean defaultValue) {
+        Uri URI = buildUri(name, key, PreferenceProvider.PREF_BOOLEAN);
         int value = defaultValue ? 1 : 0;
         Cursor cursor = context.getContentResolver().query(URI, null, null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
@@ -54,53 +58,37 @@ class PreferenceDao {
         return value == 1;
     }
 
-    public static void setString(Context context, String key, String value) {
-        insertOrUpdatePreference(context, key, value, PreferenceProvider.PREF_STRING);
-    }
-
-    public static void setBoolean(Context context, String key, boolean value) {
-        insertOrUpdatePreference(context, key, value, PreferenceProvider.PREF_BOOLEAN);
-    }
-
-    public static void setLong(Context context, String key, long value) {
-        insertOrUpdatePreference(context, key, value, PreferenceProvider.PREF_LONG);
-    }
-
-    public static void setInt(Context context, String key, int value) {
-        insertOrUpdatePreference(context, key, value, PreferenceProvider.PREF_INT);
-    }
-
     public static void remove(Context context, String key) {
         Uri URI = Uri.parse(getUriByType(PreferenceProvider.PREF_STRING) + key);
         context.getContentResolver().delete(URI, null, null);
     }
 
-    private static void  insertOrUpdatePreference(Context context, String key, String value, int type) {
-        Uri URI = Uri.parse(getUriByType(type));
+    public static void  setString(Context context, String name, String key, String value) {
+        Uri URI = buildUri(name, key, PreferenceProvider.PREF_STRING);
         ContentValues cv = new ContentValues();
         cv.put(PreferenceProvider.PREF_KEY, key);
         cv.put(PreferenceProvider.PREF_VALUE, value);
         context.getContentResolver().update(URI, cv, null, null);
     }
 
-    private static void  insertOrUpdatePreference(Context context, String key, boolean value, int type) {
-        Uri URI = Uri.parse(getUriByType(type));
+    public static void  setBoolean(Context context, String name, String key, boolean value) {
+        Uri URI = buildUri(name, key, PreferenceProvider.PREF_BOOLEAN);
         ContentValues cv = new ContentValues();
         cv.put(PreferenceProvider.PREF_KEY, key);
         cv.put(PreferenceProvider.PREF_VALUE, value);
         context.getContentResolver().update(URI, cv, null, null);
     }
 
-    private static void  insertOrUpdatePreference(Context context, String key, int value, int type) {
-        Uri URI = Uri.parse(getUriByType(type));
+    public static void  setInt(Context context, String name, String key, int value) {
+        Uri URI = buildUri(name, key, PreferenceProvider.PREF_INT);
         ContentValues cv = new ContentValues();
         cv.put(PreferenceProvider.PREF_KEY, key);
         cv.put(PreferenceProvider.PREF_VALUE, value);
         context.getContentResolver().update(URI, cv, null, null);
     }
 
-    private static void  insertOrUpdatePreference(Context context, String key, long value, int type) {
-        Uri URI = Uri.parse(getUriByType(type));
+    public static void  setLong(Context context, String name, String key, long value) {
+        Uri URI = buildUri(name, key, PreferenceProvider.PREF_LONG);
         ContentValues cv = new ContentValues();
         cv.put(PreferenceProvider.PREF_KEY, key);
         cv.put(PreferenceProvider.PREF_VALUE, value);

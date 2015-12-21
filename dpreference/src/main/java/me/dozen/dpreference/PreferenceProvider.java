@@ -7,7 +7,12 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
+import android.util.Log;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by wangyida on 15/12/18.
@@ -32,32 +37,19 @@ public class PreferenceProvider extends ContentProvider {
     public static final int PREF_INT = 3;
     public static final int PREF_LONG = 4;
 
-    public static final int GET_BOOLEAN = 5;
-    public static final int GET_STRING = 6;
-    public static final int GET_INT = 7;
-    public static final int GET_LONG = 8;
-
-    private IPrefImpl mPrefImpl;
-
     private static final UriMatcher sUriMatcher;
 
     static {
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        sUriMatcher.addURI(AUTHORITY, "boolean", PREF_BOOLEAN);
-        sUriMatcher.addURI(AUTHORITY, "string", PREF_STRING);
-        sUriMatcher.addURI(AUTHORITY, "integer", PREF_INT);
-        sUriMatcher.addURI(AUTHORITY, "long", PREF_LONG);
-
-        sUriMatcher.addURI(AUTHORITY, "boolean/*", GET_BOOLEAN);
-        sUriMatcher.addURI(AUTHORITY, "string/*", GET_STRING);
-        sUriMatcher.addURI(AUTHORITY, "integer/*", GET_INT);
-        sUriMatcher.addURI(AUTHORITY, "long/*", GET_LONG);
+        sUriMatcher.addURI(AUTHORITY, "boolean/*/*", PREF_BOOLEAN);
+        sUriMatcher.addURI(AUTHORITY, "string/*/*", PREF_STRING);
+        sUriMatcher.addURI(AUTHORITY, "integer/*/*", PREF_INT);
+        sUriMatcher.addURI(AUTHORITY, "long/*/*", PREF_LONG);
 
     }
 
     @Override
     public boolean onCreate() {
-        mPrefImpl = new PreferenceImpl(getContext(), Constants.DEFAULT_PREF_NAME);
         return true;
     }
 
@@ -65,37 +57,26 @@ public class PreferenceProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         MatrixCursor cursor = null;
+        PrefModel model = getPrefModelByUri(uri);
         switch (sUriMatcher.match(uri)) {
-            case GET_BOOLEAN:
-                if (uri != null && !TextUtils.isEmpty(uri.getLastPathSegment())) {
-                    String key = uri.getLastPathSegment();
-                    if(mPrefImpl.hasKey(key)) {
-                        cursor = preferenceToCursor(mPrefImpl.getPrefBoolean(key, false) ? 1 : 0);
-                    }
+            case PREF_BOOLEAN:
+                if (getDPreference(model.getName()).hasKey(model.getKey())) {
+                    cursor = preferenceToCursor(getDPreference(model.getName()).getPrefBoolean(model.getKey(), false) ? 1 : 0);
                 }
                 break;
-            case GET_STRING:
-                if (uri != null && !TextUtils.isEmpty(uri.getLastPathSegment())) {
-                    String key = uri.getLastPathSegment();
-                    if(mPrefImpl.hasKey(key)) {
-                        cursor = preferenceToCursor(mPrefImpl.getPrefString(key, ""));
-                    }
+            case PREF_STRING:
+                if (getDPreference(model.getName()).hasKey(model.getKey())) {
+                    cursor = preferenceToCursor(getDPreference(model.getName()).getPrefString(model.getKey(), ""));
                 }
                 break;
-            case GET_INT:
-                if (uri != null && !TextUtils.isEmpty(uri.getLastPathSegment())) {
-                    String key = uri.getLastPathSegment();
-                    if(mPrefImpl.hasKey(key)) {
-                        cursor = preferenceToCursor(mPrefImpl.getPrefInt(key, -1));
-                    }
+            case PREF_INT:
+                if (getDPreference(model.getName()).hasKey(model.getKey())) {
+                    cursor = preferenceToCursor(getDPreference(model.getName()).getPrefInt(model.getKey(), -1));
                 }
                 break;
-            case GET_LONG:
-                if (uri != null && !TextUtils.isEmpty(uri.getLastPathSegment())) {
-                    String key = uri.getLastPathSegment();
-                    if(mPrefImpl.hasKey(key)) {
-                        cursor = preferenceToCursor(mPrefImpl.getPrefLong(key, -1));
-                    }
+            case PREF_LONG:
+                if (getDPreference(model.getName()).hasKey(model.getKey())) {
+                    cursor = preferenceToCursor(getDPreference(model.getName()).getPrefLong(model.getKey(), -1));
                 }
                 break;
         }
@@ -117,13 +98,13 @@ public class PreferenceProvider extends ContentProvider {
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         switch (sUriMatcher.match(uri)) {
-            case GET_BOOLEAN:
-            case GET_LONG:
-            case GET_STRING:
-            case GET_INT:
-                if (uri != null && !TextUtils.isEmpty(uri.getLastPathSegment())) {
-                    String key = uri.getLastPathSegment();
-                    mPrefImpl.removePreference(key);
+            case PREF_BOOLEAN:
+            case PREF_LONG:
+            case PREF_STRING:
+            case PREF_INT:
+                PrefModel model = getPrefModelByUri(uri);
+                if (model != null) {
+                    getDPreference(model.getName()).removePreference(model.getKey());
                 }
                 break;
             default:
@@ -134,18 +115,22 @@ public class PreferenceProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        PrefModel model = getPrefModelByUri(uri);
+        if(model == null) {
+            throw new IllegalArgumentException("update prefModel is null");
+        }
         switch (sUriMatcher.match(uri)) {
             case PREF_BOOLEAN:
-                persistBoolean(values);
+                persistBoolean(model.getName(), values);
                 break;
             case PREF_LONG:
-                persistLong(values);
+                persistLong(model.getName(), values);
                 break;
             case PREF_STRING:
-                persistString(values);
+                persistString(model.getName(), values);
                 break;
             case PREF_INT:
-                persistInt(values);
+                persistInt(model.getName(), values);
                 break;
             default:
                 throw new IllegalStateException("update unsupported uri : " + uri);
@@ -162,41 +147,82 @@ public class PreferenceProvider extends ContentProvider {
         return matrixCursor;
     }
 
-    private void persistInt(ContentValues values) {
-        if(values == null) {
+    private void persistInt(String name, ContentValues values) {
+        if (values == null) {
             throw new IllegalArgumentException(" values is null!!!");
         }
         String kInteger = values.getAsString(PREF_KEY);
         int vInteger = values.getAsInteger(PREF_VALUE);
-        mPrefImpl.setPrefInt(kInteger, vInteger);
+        getDPreference(name).setPrefInt(kInteger, vInteger);
     }
 
-    private void persistBoolean(ContentValues values) {
-        if(values == null) {
+    private void persistBoolean(String name, ContentValues values) {
+        if (values == null) {
             throw new IllegalArgumentException(" values is null!!!");
         }
         String kBoolean = values.getAsString(PREF_KEY);
         boolean vBoolean = values.getAsBoolean(PREF_VALUE);
-        mPrefImpl.setPrefBoolean(kBoolean, vBoolean);
+        getDPreference(name).setPrefBoolean(kBoolean, vBoolean);
     }
 
-    private void persistLong(ContentValues values) {
-        if(values == null) {
+    private void persistLong(String name, ContentValues values) {
+        if (values == null) {
             throw new IllegalArgumentException(" values is null!!!");
         }
         String kLong = values.getAsString(PREF_KEY);
         long vLong = values.getAsLong(PREF_VALUE);
-        mPrefImpl.setPrefLong(kLong, vLong);
+        getDPreference(name).setPrefLong(kLong, vLong);
     }
 
-    private void persistString(ContentValues values) {
-        if(values == null) {
+    private void persistString(String name, ContentValues values) {
+        if (values == null) {
             throw new IllegalArgumentException(" values is null!!!");
         }
         String kString = values.getAsString(PREF_KEY);
         String vString = values.getAsString(PREF_VALUE);
-        mPrefImpl.setPrefString(kString, vString);
+        getDPreference(name).setPrefString(kString, vString);
     }
 
+    private static Map<String, IPrefImpl> sPreferences = new ArrayMap<>();
+
+    private IPrefImpl getDPreference(String name) {
+        if (TextUtils.isEmpty(name)) {
+            throw new IllegalArgumentException("getDPreference name is null!!!");
+        }
+        if (sPreferences.get(name) == null) {
+            IPrefImpl pref = new PreferenceImpl(getContext(), name);
+            sPreferences.put(name, pref);
+        }
+        return sPreferences.get(name);
+    }
+
+    private PrefModel getPrefModelByUri(Uri uri) {
+        if (uri == null || uri.getPathSegments().size() != 3) {
+            throw new IllegalArgumentException("getPrefModelByUri uri is wrong : " + uri);
+        }
+        String name = uri.getPathSegments().get(1);
+        String key = uri.getPathSegments().get(2);
+        return new PrefModel(name, key);
+
+    }
+
+    private static class PrefModel {
+        String name;
+
+        String key;
+
+        public PrefModel(String name, String key) {
+            this.name = name;
+            this.key = key;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getKey() {
+            return key;
+        }
+    }
 
 }

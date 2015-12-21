@@ -8,46 +8,54 @@ import android.content.Context;
  */
 public class DPreference {
 
+    Context mContext;
+
+    String mName;
 
     private DPreference() {
     }
 
-    public static String getPrefString(Context context, final String key,
-                                       final String defaultValue) {
-        return PreferenceDao.getString(context, key, defaultValue);
+    public DPreference(Context context, String name) {
+        this.mContext = context;
+        this.mName = name;
     }
 
-    public static void setPrefString(Context context, final String key, final String value) {
-        PreferenceDao.setString(context, key, value);
+    public String getPrefString(final String key,
+                                final String defaultValue) {
+        return PreferenceDao.getString(mContext, mName, key, defaultValue);
     }
 
-    public static boolean getPrefBoolean(Context context, final String key,
-                                         final boolean defaultValue) {
-        return PreferenceDao.getBoolean(context, key, defaultValue);
+    public void setPrefString(final String key, final String value) {
+        PreferenceDao.setString(mContext, mName, key, value);
     }
 
-    public static void setPrefBoolean(Context context, final String key, final boolean value) {
-        PreferenceDao.setBoolean(context, key, value);
+    public boolean getPrefBoolean(final String key,
+                                  final boolean defaultValue) {
+        return PreferenceDao.getBoolean(mContext, mName, key, defaultValue);
     }
 
-    public static void setPrefInt(Context context, final String key, final int value) {
-        PreferenceDao.setInt(context, key, value);
+    public void setPrefBoolean(final String key, final boolean value) {
+        PreferenceDao.setBoolean(mContext, mName, key, value);
     }
 
-    public static int getPrefInt(Context context, final String key, final int defaultValue) {
-        return PreferenceDao.getInt(context, key, defaultValue);
+    public void setPrefInt( final String key, final int value) {
+        PreferenceDao.setInt(mContext, mName, key, value);
     }
 
-    public static void setPrefLong(Context context, final String key, final long value) {
-        PreferenceDao.setLong(context, key, value);
+    public int getPrefInt(final String key, final int defaultValue) {
+        return PreferenceDao.getInt(mContext, mName, key, defaultValue);
     }
 
-    public static long getPrefLong(Context context, final String key, final long defaultValue) {
-        return PreferenceDao.getLong(context, key, defaultValue);
+    public void setPrefLong( final String key, final long value) {
+        PreferenceDao.setLong(mContext, mName, key, value);
     }
 
-    public static void removePreference(Context context, final String key) {
-        PreferenceDao.remove(context, key);
+    public long getPrefLong(final String key, final long defaultValue) {
+        return PreferenceDao.getLong(mContext, mName, key, defaultValue);
+    }
+
+    public void removePreference(final String key) {
+        PreferenceDao.remove(mContext, key);
     }
 
 }
