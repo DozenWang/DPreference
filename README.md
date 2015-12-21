@@ -8,7 +8,7 @@ Google even deprecated the multiprocess support because it never worked relieabl
 
 [![](https://cloud.githubusercontent.com/assets/1096485/9793296/110575d2-57e5-11e5-9728-34d3597771b8.png)](http://developer.android.com/reference/android/content/Context.html#MODE_MULTI_PROCESS)
 
-DPreference is a way solving this problem powered by a ContentProvider. It works in multiple processed mode safely. You can declare your provider in a remote process, if you don't declare it in AndroidManifest.xml, the default is main process.
+DPreference is a way solving this problem powered by a ContentProvider. It works in multiple processed mode safely. You can declare your provider in a remote process, if you don't declare it in AndroidManifest.xml, it is operating in main process by default.
 
 ####Features
 - **works multiprocess safely**
